@@ -1,0 +1,24 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/mpris",
+  "crates/notify",
+  "crates/protocol",
+  "crates/remaining",
+  "crates/scrobble",
+]
+
+# The plugins are programs, not libraries: every crate here builds one binary that `aurora`
+# spawns, and the only contract between the two repositories is `docs/protocol.md`. A plugin
+# built against protocol 1 keeps working with a player built against protocol 1, and a change
+# to a plugin never rebuilds the player.
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+lto = "thin"
+strip = true

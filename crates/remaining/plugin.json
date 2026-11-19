@@ -1,0 +1,12 @@
+{
+  "name": "remaining",
+  "version": "0.1.0",
+  "protocol": 1,
+  "layer": "status",
+  "slot": "queue",
+  "permissions": ["model", "status"],
+  "group": "ВИД",
+  "about": "сколько осталось до конца очереди",
+  "default": true,
+  "exec": "aurora-remaining"
+}

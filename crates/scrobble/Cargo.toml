@@ -1,0 +1,12 @@
+[package]
+name = "aurora-scrobble"
+description = "Counts a listen and posts it to ListenBrainz"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "aurora-scrobble"
+path = "src/main.rs"
+
+[dependencies]
+aurora-plugin-protocol = { path = "../protocol" }

@@ -1,0 +1,11 @@
+{
+  "name": "notify",
+  "version": "0.1.0",
+  "protocol": 1,
+  "layer": "service",
+  "permissions": ["model"],
+  "group": "СВЯЗЬ",
+  "about": "уведомление при смене трека",
+  "default": true,
+  "exec": "aurora-notify"
+}

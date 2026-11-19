@@ -1,0 +1,12 @@
+[package]
+name = "aurora-remaining"
+description = "How much music is left in the queue, as one status line"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "aurora-remaining"
+path = "src/main.rs"
+
+[dependencies]
+aurora-plugin-protocol = { path = "../protocol" }

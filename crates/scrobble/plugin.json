@@ -1,0 +1,11 @@
+{
+  "name": "scrobble",
+  "version": "0.1.0",
+  "protocol": 1,
+  "layer": "service",
+  "permissions": ["model"],
+  "group": "СВЯЗЬ",
+  "about": "прослушивания в ListenBrainz",
+  "default": false,
+  "exec": "aurora-scrobble"
+}

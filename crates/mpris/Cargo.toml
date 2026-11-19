@@ -1,0 +1,12 @@
+[package]
+name = "aurora-mpris"
+description = "MPRIS over the session bus: media keys, widgets, KDE Connect"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "aurora-mpris"
+path = "src/main.rs"
+
+[dependencies]
+aurora-plugin-protocol = { path = "../protocol" }

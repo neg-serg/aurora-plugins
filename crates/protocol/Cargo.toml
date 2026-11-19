@@ -1,0 +1,9 @@
+[package]
+name = "aurora-plugin-protocol"
+description = "The JSON-lines wire between aurora and an external plugin"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "aurora_protocol"
+path = "src/lib.rs"

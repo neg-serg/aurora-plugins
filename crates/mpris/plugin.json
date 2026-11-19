@@ -1,0 +1,11 @@
+{
+  "name": "mpris",
+  "version": "0.1.0",
+  "protocol": 1,
+  "layer": "service",
+  "permissions": ["model", "commands"],
+  "group": "СВЯЗЬ",
+  "about": "медиаклавиши и виджеты рабочего стола",
+  "default": true,
+  "exec": "aurora-mpris"
+}

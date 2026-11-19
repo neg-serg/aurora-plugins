@@ -1,0 +1,12 @@
+[package]
+name = "aurora-notify"
+description = "One desktop notification per track change, grouped under its sender"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "aurora-notify"
+path = "src/main.rs"
+
+[dependencies]
+aurora-plugin-protocol = { path = "../protocol" }
