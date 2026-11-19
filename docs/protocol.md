@@ -28,8 +28,9 @@ player                                   plugin
 1. The player starts the program with its working directory set to the plugin directory, stdin and
    stdout piped, stderr inherited (so a plugin's own diagnostics reach the player's terminal).
 2. It writes `hello` and waits at most **500 ms** for `ready`. A plugin that does not answer is
-   refused and its process is killed; a plugin that needs a socket must connect *after* `ready`,
-   on a thread of its own.
+   refused and its process is killed. A plugin that needs a socket does not make the handshake
+   wait for it: `mpris` starts its bus thread in `hello` and `ready` is written at once, so a bus
+   that is down is a retry in the background, never a player that does not start.
 3. It writes `state` whenever the now-playing facts change, coalesced to at most one line per
    250 ms. A playing track's `elapsed` is quantised to a quarter of a second; the plugin
    interpolates the position if it needs a smooth clock. A paused or still session sends nothing.
