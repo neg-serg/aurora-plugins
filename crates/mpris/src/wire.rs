@@ -133,6 +133,9 @@ impl Message {
         )
     }
 
+    /// The codec's own tests read the path; `bus.rs` matches a call on its `interface` and
+    /// `member`, and the object path here is always the one this plugin serves.
+    #[cfg(test)]
     pub fn path(&self) -> Option<&str> {
         self.get(|f| match f {
             Field::Path(p) => Some(p.as_str()),
@@ -154,6 +157,9 @@ impl Message {
         })
     }
 
+    /// The tests check the signature a reply or a signal carries; nothing in `bus.rs` asks, so it
+    /// is absent from a release build.
+    #[cfg(test)]
     pub fn signature(&self) -> Option<&str> {
         self.get(|f| match f {
             Field::Signature(p) => Some(p.as_str()),
@@ -390,7 +396,10 @@ impl Writer {
         self.buf[length_at..length_at + 4].copy_from_slice(&length.to_le_bytes());
     }
 
-    /// `(...)`: a struct, whose fields follow the same alignment rule as everything else.
+    /// `(...)`: a struct, whose fields follow the same alignment rule as everything else. The
+    /// codec's tests write one; no message this player serves carries one, so a release build has
+    /// no copy of the writer.
+    #[cfg(test)]
     pub fn structure(&mut self, align: usize, write: &mut dyn FnMut(&mut Writer)) {
         self.pad(align);
         write(self);
@@ -437,6 +446,9 @@ pub enum Prop {
     Str(String),
     Obj(String),
     Bool(bool),
+    /// `u`: the codec writes and matches it, and its tests prove the signature round-trips; no
+    /// property this player publishes is one today, so nothing constructs it in a release build.
+    #[allow(dead_code)]
     U32(u32),
     I64(i64),
     F64(f64),
