@@ -1,0 +1,12 @@
+{
+  "name": "musicbrainz",
+  "version": "0.1.0",
+  "protocol": 1,
+  "layer": "status",
+  "slot": "release",
+  "permissions": ["model", "config", "status"],
+  "group": "СВЯЗЬ",
+  "about": "релиз играющего трека",
+  "default": false,
+  "exec": "aurora-musicbrainz"
+}

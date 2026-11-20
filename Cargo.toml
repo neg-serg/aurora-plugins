@@ -2,7 +2,9 @@
 resolver = "2"
 members = [
   "crates/autodj",
+  "crates/lyrics",
   "crates/mpris",
+  "crates/musicbrainz",
   "crates/notify",
   "crates/protocol",
   "crates/remaining",

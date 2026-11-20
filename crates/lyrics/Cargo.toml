@@ -1,0 +1,12 @@
+[package]
+name = "aurora-lyrics"
+description = "The .lrc beside the playing file, as one status line"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "aurora-lyrics"
+path = "src/main.rs"
+
+[dependencies]
+aurora-plugin-protocol = { path = "../protocol" }

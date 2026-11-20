@@ -1,5 +1,5 @@
 {
-  description = "aurora-plugins: notify, scrobble, mpris and remaining outside the player";
+  description = "aurora-plugins: the player's plugins as programs outside its build";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 

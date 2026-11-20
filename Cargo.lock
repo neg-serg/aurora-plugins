@@ -10,7 +10,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "aurora-lyrics"
+version = "0.1.0"
+dependencies = [
+ "aurora-plugin-protocol",
+]
+
+[[package]]
 name = "aurora-mpris"
+version = "0.1.0"
+dependencies = [
+ "aurora-plugin-protocol",
+]
+
+[[package]]
+name = "aurora-musicbrainz"
 version = "0.1.0"
 dependencies = [
  "aurora-plugin-protocol",

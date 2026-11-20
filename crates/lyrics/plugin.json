@@ -1,0 +1,12 @@
+{
+  "name": "lyrics",
+  "version": "0.1.0",
+  "protocol": 1,
+  "layer": "status",
+  "slot": "lyric",
+  "permissions": ["model", "config", "status"],
+  "group": "ВИД",
+  "about": "текст песни из .lrc",
+  "default": true,
+  "exec": "aurora-lyrics"
+}

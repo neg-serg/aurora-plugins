@@ -1,0 +1,12 @@
+[package]
+name = "aurora-musicbrainz"
+description = "The playing recording's release, as one status line"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "aurora-musicbrainz"
+path = "src/main.rs"
+
+[dependencies]
+aurora-plugin-protocol = { path = "../protocol" }

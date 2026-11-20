@@ -3,11 +3,12 @@
 # No recipe pins `CARGO_HOME` or fetches from the network: there are no third-party crates, so
 # every build is `cargo ... --offline` and a machine with no network can build the plugins.
 
-# Build the five release binaries.
+# Build the seven release binaries.
 build:
     cargo build --release --offline
 
-# The protocol crate and each plugin's own rule (listen arithmetic, plural, argv, D-Bus framing).
+# The protocol crate and each plugin's own rule (listen arithmetic, plural, argv, D-Bus framing,
+# the .lrc parser, the MusicBrainz query).
 test:
     cargo test --offline
 
