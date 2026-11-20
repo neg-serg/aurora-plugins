@@ -1,0 +1,16 @@
+{
+  "name": "spectroscope",
+  "version": "0.1.0",
+  "protocol": 1,
+  "layer": "service",
+  "permissions": ["draw", "audio", "model", "config"],
+  "group": "ВИД",
+  "about": "спектрограмма играющего трека",
+  "height": 190.0,
+  "instrument": {
+    "label": "спектрограф",
+    "press": "whole_track"
+  },
+  "default": false,
+  "exec": "aurora-spectroscope"
+}

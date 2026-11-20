@@ -1,0 +1,12 @@
+[package]
+name = "aurora-spectroscope"
+description = "The playing session's spectrum, as an RME-style waterfall in the column"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "aurora-spectroscope"
+path = "src/main.rs"
+
+[dependencies]
+aurora-plugin-protocol = { path = "../protocol" }

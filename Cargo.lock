@@ -54,3 +54,10 @@ version = "0.1.0"
 dependencies = [
  "aurora-plugin-protocol",
 ]
+
+[[package]]
+name = "aurora-spectroscope"
+version = "0.1.0"
+dependencies = [
+ "aurora-plugin-protocol",
+]

@@ -9,6 +9,7 @@ members = [
   "crates/protocol",
   "crates/remaining",
   "crates/scrobble",
+  "crates/spectroscope",
 ]
 
 # The plugins are programs, not libraries: every crate here builds one binary that `aurora`

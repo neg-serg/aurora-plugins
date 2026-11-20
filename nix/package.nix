@@ -21,7 +21,7 @@ rustPlatform.buildRustPackage {
   # The player reads a plugin directory: the manifest and the program beside it. The binaries also
   # live in `$out/bin` so a person can try one from a shell.
   postInstall = ''
-    for name in notify scrobble mpris remaining autodj lyrics musicbrainz; do
+    for name in notify scrobble mpris remaining autodj lyrics musicbrainz spectroscope; do
       mkdir -p "$out/lib/aurora/plugins/$name"
       install -m 0644 "crates/$name/plugin.json" "$out/lib/aurora/plugins/$name/plugin.json"
       ln -s "$out/bin/aurora-$name" "$out/lib/aurora/plugins/$name/aurora-$name"
@@ -29,7 +29,7 @@ rustPlatform.buildRustPackage {
   '';
 
   meta = {
-    description = "aurora's external plugins: notify, scrobble, mpris, remaining, autodj, lyrics and musicbrainz";
+    description = "aurora's external plugins: notify, scrobble, mpris, remaining, autodj, lyrics, musicbrainz and spectroscope";
     mainProgram = "aurora-notify";
   };
 }
