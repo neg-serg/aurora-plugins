@@ -106,6 +106,29 @@ version does not name is ignored.
 
 The process is about to end. The player may kill it immediately anyway.
 
+### `frame`
+
+To a plugin with the `draw` permission, every frame the player draws:
+
+```json
+{"type":"frame","canvas":{"w":260.0,"h":190.0},"time":12.4333,
+ "samples":{"rate":48000.0,"data":"AAAA..."}}
+```
+
+| field | type | meaning |
+|---|---|---|
+| `canvas.w`, `canvas.h` | number | the slot's size in logical units — the space a draw op is written in |
+| `time` | number | seconds since start: the animation clock, frame-driven in a pinned capture |
+| `samples.rate` | number | the stream's rate in hertz (`0` before the daemon answers) |
+| `samples.data` | string | the scope window, base64 of little-endian `f32`, oldest first |
+
+`samples` is present only for a plugin that asked for the `audio` permission: it is the same window
+the in-tree instruments analyse, and a plugin that never asked is never sent a sample. The player
+never waits for the frame to be answered, and the protocol has no timer — a plugin that needs one
+runs a thread of its own. The window is sent every frame while it is drawn: eighteen kilobytes of
+picture and eight of samples are the price of the process boundary, and a stateful canvas two
+processes could disagree about would be worse.
+
 ## Messages the plugin writes
 
 ### `ready`
@@ -172,6 +195,38 @@ One line on the player's stderr.
 name, which is why the example has `[notify]`). An `error` during `hello` disables the plugin for
 the session.
 
+### `draw`
+
+What a painting plugin answers a `frame` with: one frame's primitives, in paint order, in its own
+slot-local space. The player paints the newest drawing it has on the **next** frame and drops older
+ones; a drawing replaces the previous one entirely, so a plugin that stops answering stops painting
+instead of freezing its last picture over the frame.
+
+```json
+{"type":"draw","ops":[
+  {"op":"waterfall","x":22,"y":0,"w":439,"h":190,"width":90,"height":200,
+   "levels":"<base64>","ramp":["panel_inset","accent2","accent","text"]},
+  {"op":"rect","x":141,"y":0,"w":1,"h":190,"radius":0,"color":"rule"},
+  {"op":"text","text":"20k","x":0,"y":18,"size":8,"color":"text_faint"}
+]}
+```
+
+| op | fields |
+|---|---|
+| `rect` | `x`, `y`, `w`, `h`, `radius`, `color` |
+| `text` | `text`, `x`, `y`, `size`, `color` |
+| `waterfall` | `x`, `y`, `w`, `h`, `width`, `height`, `levels` (base64 of `width × height` bytes, 0..=255), `ramp` (four token names, quiet floor to peak) |
+
+Coordinates and sizes are in the slot's logical units. `color` is a **theme token by name** —
+`text`, `text_dim`, `text_faint`, `accent`, `accent2`, `selection`, `panel_inset`, `rule`,
+`mood_bright`, `mood_energy`, `mood_calm`, `mood_dark`, `mood_love`, `mood_work` — and an op that
+names an unknown one is skipped: a program cannot introduce an ink the theme audit has not measured.
+The player clips to the slot and caps the op count exactly as it does for an in-tree plugin, and an
+op outside the slot is dropped and counted.
+
+A `waterfall` is a level picture, not a colour picture: the player rasterises it through the four
+tokens, so a skin switch recolours it without the plugin being told.
+
 ## The manifest
 
 Every plugin directory holds a `plugin.json` beside the program:
@@ -198,7 +253,9 @@ Every plugin directory holds a `plugin.json` beside the program:
 | `protocol` | yes | `1` for this wire |
 | `layer` | no | `service` (default: a zero-height block that reacts to states) or `status` (one line in the bar) |
 | `slot` | for `status` | the fact the line fills (`queue` for remaining) |
-| `permissions` | no | `model`, `commands`, `status`, `config`; anything else is refused, because an external plugin does not paint and has no pointer |
+| `permissions` | no | `model`, `commands`, `status`, `config`, `draw`, `audio`; anything else is refused, because a program has no pointer, no keyboard and no files |
+| `height` | for `draw` | the slot's height in logical units: the column measures its stack before the first frame arrives |
+| `instrument` | no | `{"label": "спектрограф", "press": "whole_track"}`: the word the column prints for the block and what a press on it means |
 | `group` | no | the PLUGINS section's category (`ВИД`, `СВЯЗЬ`, …); `ВНЕШНИЕ` when absent |
 | `about` | no | the one line under the card's name |
 | `default` | no | load it in a run that says nothing (default `false`) |
@@ -227,5 +284,11 @@ is silence: most machines have no external plugins.
 A plugin is not part of `cargo test`'s picture and must not make a capture depend on its own
 scheduling. The player helps: `dry_run` disables everything that touches the machine, `ready` is
 waited for at start-up, and a status plugin's first line is waited for on the first frame. A plugin
-that draws nothing (every one here but `remaining`) cannot move a pixel; `remaining` moves one
-string, and that string is a function of the queue.
+that draws nothing (every one here but `remaining` and `spectroscope`) cannot move a pixel;
+`remaining` moves one string, and that string is a function of the queue.
+
+A painting plugin is one frame behind by construction — it is asked about a frame and its drawing is
+painted by the next one — and that lag is fixed, not racy: the canvas is a function of the frame
+message. The one thing that cannot be pinned is the `audio` window, because its producer is live: a
+capture of a spectrogram is a picture of a moment, and the instrument's own record in the player's
+repository says so.

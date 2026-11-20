@@ -17,6 +17,8 @@
 //! the plugin, write the answers. Everything a plugin does with its time between two states —
 //! serving a bus, polling a daemon — is a thread it owns.
 
+pub mod b64;
+pub mod canvas;
 pub mod json;
 
 use std::io::{BufRead, Write};
@@ -187,6 +189,8 @@ impl Hello {
 pub enum Incoming {
     Hello(Hello),
     State(State),
+    /// One frame of the canvas, to a plugin that paints.
+    Frame(Frame),
     Bye,
 }
 
@@ -215,7 +219,53 @@ pub fn parse_incoming(line: &str) -> Result<Incoming, String> {
             root.get("state").unwrap_or(&json::Value::Null),
         ))),
         "bye" => Ok(Incoming::Bye),
+        "frame" => Ok(Incoming::Frame(Frame::from_value(&root))),
         other => Err(format!("unknown message `{other}`")),
+    }
+}
+
+/// One frame of the canvas: the slot's size, the player's clock, and — for a plugin that asked
+/// for `audio` — the session's scope window.
+///
+/// A plugin that paints is sent this every frame and answers with a [`canvas::Canvas`]; the player
+/// paints it on the *next* frame, because a process cannot answer inside the frame that asked.
+/// One frame of lag is a picture of a measurement, not an animation of it.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct Frame {
+    /// The slot's width in logical units: the space a canvas op is written in.
+    pub width: f32,
+    /// The slot's height, the one the plugin declared in its manifest.
+    pub height: f32,
+    /// Seconds since start — the animation clock, frame-driven in a pinned capture.
+    pub time: f32,
+    /// The scope window, oldest sample first. Empty when the plugin did not ask for `audio`: the
+    /// window is what the in-tree instruments got, and it is the only input a spectrogram needs.
+    pub samples: Vec<f32>,
+    /// The stream's rate in hertz, `0` when the daemon has not answered yet.
+    pub rate: f32,
+}
+
+impl Frame {
+    pub fn from_value(root: &json::Value) -> Frame {
+        let number = |value: Option<&json::Value>, key: &str| {
+            value
+                .and_then(|value| value.get(key))
+                .and_then(|value| value.as_f64())
+                .unwrap_or(0.0) as f32
+        };
+        let canvas = root.get("canvas");
+        let samples = root.get("samples");
+        Frame {
+            width: number(canvas, "w"),
+            height: number(canvas, "h"),
+            time: number(Some(root), "time"),
+            samples: samples
+                .and_then(|value| value.get("data"))
+                .and_then(|value| value.as_str())
+                .and_then(b64::decode_samples)
+                .unwrap_or_default(),
+            rate: number(samples, "rate"),
+        }
     }
 }
 
@@ -355,6 +405,9 @@ pub enum Output {
     /// One line for the status bar: the fact it fills and the words.
     Status { slot: String, text: String },
     Command(Action),
+    /// One frame's drawing, for a plugin that paints: the primitives the player will paint into
+    /// the plugin's slot, replacing whatever the previous frame drew.
+    Draw(canvas::Canvas),
     /// A line for the player's log (`info`, `warn`, `error`).
     Log { level: String, text: String },
     Bye,
@@ -385,6 +438,7 @@ impl Output {
                 ("type", Value::Str("command".into())),
                 ("command", action.to_value()),
             ]),
+            Output::Draw(canvas) => canvas.to_value(),
             Output::Log { level, text } => obj(vec![
                 ("type", Value::Str("log".into())),
                 ("level", Value::Str(level.clone())),
@@ -449,6 +503,11 @@ pub trait Sidecar {
     /// One snapshot. Called on every state the player sends, in order.
     fn state(&mut self, _state: &State, _sink: &Sink) {}
 
+    /// One frame of the canvas. Called on every frame the player draws, with the slot's size and
+    /// the clock; the plugin answers by sending a [`canvas::Canvas`] through the sink, and the
+    /// player paints it on the next frame. A plugin that does not paint never sees this.
+    fn frame(&mut self, _frame: &Frame, _sink: &Sink) {}
+
     /// The host said `bye` (or closed the pipe). The process is about to exit; a plugin with a
     /// thread may use this to leave cleanly.
     fn bye(&mut self, _sink: &Sink) {}
@@ -504,6 +563,10 @@ impl<P: Sidecar> Engine<P> {
                     sink.log("warn", "state before hello; using the defaults");
                 }
                 self.plugin.state(&state, sink);
+                Ok(true)
+            }
+            Incoming::Frame(frame) => {
+                self.plugin.frame(&frame, sink);
                 Ok(true)
             }
             Incoming::Bye => {
