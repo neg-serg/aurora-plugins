@@ -3,7 +3,7 @@
 # No recipe pins `CARGO_HOME` or fetches from the network: there are no third-party crates, so
 # every build is `cargo ... --offline` and a machine with no network can build the plugins.
 
-# Build the four release binaries.
+# Build the five release binaries.
 build:
     cargo build --release --offline
 

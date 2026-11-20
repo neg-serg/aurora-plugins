@@ -227,5 +227,5 @@ is silence: most machines have no external plugins.
 A plugin is not part of `cargo test`'s picture and must not make a capture depend on its own
 scheduling. The player helps: `dry_run` disables everything that touches the machine, `ready` is
 waited for at start-up, and a status plugin's first line is waited for on the first frame. A plugin
-that draws nothing (all four here) cannot move a pixel; `remaining` moves one string, and that
-string is a function of the queue.
+that draws nothing (every one here but `remaining`) cannot move a pixel; `remaining` moves one
+string, and that string is a function of the queue.

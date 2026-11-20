@@ -1,6 +1,6 @@
 # aurora-plugins — the player's external plugins.
 #
-# The four programs are programs, not a library: `aurora` spawns them and speaks JSON lines. They
+# The five programs are programs, not a library: `aurora` spawns them and speaks JSON lines. They
 # have no dependencies, so the build is offline and the `Cargo.lock` is the only pin.
 {
   lib,
@@ -21,7 +21,7 @@ rustPlatform.buildRustPackage {
   # The player reads a plugin directory: the manifest and the program beside it. The binaries also
   # live in `$out/bin` so a person can try one from a shell.
   postInstall = ''
-    for name in notify scrobble mpris remaining; do
+    for name in notify scrobble mpris remaining autodj; do
       mkdir -p "$out/lib/aurora/plugins/$name"
       install -m 0644 "crates/$name/plugin.json" "$out/lib/aurora/plugins/$name/plugin.json"
       ln -s "$out/bin/aurora-$name" "$out/lib/aurora/plugins/$name/aurora-$name"
@@ -29,7 +29,7 @@ rustPlatform.buildRustPackage {
   '';
 
   meta = {
-    description = "aurora's external plugins: notify, scrobble, mpris and remaining";
+    description = "aurora's external plugins: notify, scrobble, mpris, remaining and autodj";
     mainProgram = "aurora-notify";
   };
 }

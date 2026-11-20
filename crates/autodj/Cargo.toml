@@ -1,0 +1,12 @@
+[package]
+name = "aurora-autodj"
+description = "Keep the queue from running out, as a service program"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "aurora-autodj"
+path = "src/main.rs"
+
+[dependencies]
+aurora-plugin-protocol = { path = "../protocol" }

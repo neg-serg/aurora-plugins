@@ -1,0 +1,11 @@
+{
+  "name": "autodj",
+  "version": "0.1.0",
+  "protocol": 1,
+  "layer": "service",
+  "permissions": ["model", "commands", "config"],
+  "group": "ОЧЕРЕДЬ",
+  "about": "добивает очередь похожими треками",
+  "default": false,
+  "exec": "aurora-autodj"
+}
